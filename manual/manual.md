@@ -93,6 +93,7 @@ The plugin comes with a few examples. You can find them in the `godot_state_char
 - `order_of_events` - an example state chart to explore in which order events are fired. See also the [appendix](#order-of-events) for more information.
 - `performance_test` - this example is a small test harness to evaluate how larger amounts of state charts will perform. It contains a state chart in `state_chart.tscn` which you can adapt to match your desired scenario. The actual performance will depend on what callback signals you will use so you should adapt the state chart in `state_chart.tscn` to match your scenario. Then there are scenes named `ten_state_charts.tscn`, `hundred_state_charts.tscn` and `thousand_state_charts.tscn` which each contain 10, 100 or 1000 instances of the state chart from `state_chart.tscn`. You can run these scenes to see how many instances of the state chart  you can run on your machine. Use the profiler to see how much time is spent in the state chart code. 
 - `platformer` - a simple platformer game with a state chart for the player character that handles movement, jumping, falling, double jumps, coyote jumps and animation control. This example shows how state charts can massively simplify the code needed to implement a full player character controller. The character controller code is less than 70 lines of code.
+- `random_transitions` - an example how to use expressions to randomly transition between states and controlling the length of transition delays.
 - `stepping` - an example on how to use stepping mode in a turn-based game. See also the section on [stepping mode](#stepping-mode) for more information.
 
 ### The _State Chart_ node
@@ -300,7 +301,7 @@ The signal is only emitted when the transition is taken, not when it is pending.
 
 #### Automatic transitions
 
-It is possible to have transitions with an empty _Event_ field. These transitions will be evaluated whenever you enter a state, send an event or set an expression property (see [expression guards](#expression-guards)). This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html) or react to changes in expression properties. Usually you will put a guard on such an automatic transition to make sure it is only taken when a certain condition is met. 
+It is possible to have transitions with an empty _Event_ field. These transitions will be evaluated whenever you change a state, send an event or set an expression property (see [expression guards](#expression-guards)). This is useful for modeling [condition states](https://statecharts.dev/glossary/condition-state.html) or react to changes in expression properties. Usually you will put a guard on such an automatic transition to make sure it is only taken when a certain condition is met. 
 
 ![Alt text](immediate_transition.png)
 
@@ -311,6 +312,8 @@ Note that automatic transitions will still only be evaluated for currently activ
 Transitions can execute immediately or after a certain time has elapsed. If a transition has no time delay it will be executed immediately (within the same frame). If a transition has a time delay, it will be marked as pending and executed after the time delay has elapsed but only if the state to which the transition belongs is still active at this time and was not left temporarily. Only one transition can ever be active or pending for any given state. So if another transition is executed for a state while one is pending, the pending transition will be discarded. A pending transition is also cancelled when the state is left through other means (e.g. because a parent state got deactivated). There is one exception to this rule, when you are using history states. When you leave a state and re-enter it through a history state, then any pending transition will be resumed as if you had never left the state.
 
 When you have a transition that is both delayed and automatic, the transition will be marked as pending when it's condition is met. If subsequently the condition is no longer met, it will still be executed unless another transition is marked as pending in the meantime or the state is left through other means.
+
+Transition delay is an expression, which means you can not only put in a number of seconds, but also use expressions to calculate the delay. This is useful if you want to have a random delay or a delay that depends on an expression property - e.g. a cooldown that depends on the player's level or a random delay for an enemy to make it less predictable.
 
 #### Transition guards
 
@@ -549,6 +552,16 @@ Godot has a very nice built-in comment field named "Editor Description". Use thi
 
 Usually you don't need to worry too much about the order in which state changes are processed but there are some instances where it is important to know the order in which events are processed. The following will give you an overview on the inner workings and the order in which events are processed.
 
+#### Generic event handling rules
+
+The state chart reacts to these events:
+
+- an explicit event was sent to the state chart node using the `send_event` function.
+- an expression property was changed using the `set_expression_property` function.
+- 
+Whenever an event occurs, the state chart will try to find transitions that react to this event. Only transitions in states that are currently active will be considered. Transitions will be checked in a depth-first manner. So the innermost transition that handles any given event (be it explicit or automatic) will run. When a transition runs, the event is considered as handled and will no longer be processed by any other transition, except if that other transition happens to live in a parallel state (each parallel state can handle events even if that event was already handled by another parallel state). If the transition has a guard and it evaluates to `false` then the next transition that reacts to the event will be checked. If no transition reacts to the event, the event will bubble up to the parent state. This process will continue until the event is handled or the root state is reached. If the event is not handled by any state, it will be ignored. 
+
+#### Example
 For this example we will use the following state chart:
 
 ![Example state chart for the order of events](order_of_events_chart.png) 

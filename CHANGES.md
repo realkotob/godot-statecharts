@@ -3,12 +3,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## Unreleased
+
+## [0.16.0] - 2024-06-06 
+### Added
+- The delay for a transition can now be an expression rather than just a float value. This allows for more dynamic transitions. For example the delay can now be a random value (using `randf_range()`) or any expression property. Of course you can still just use a single float number.  This change is backwards-compatible, all existing state charts will automatically be converted to the new format when loaded. There is a new example named `random_transitions` which shows this new feature to create a randomly wandering mob. A big thanks goes out to [Miguel Silva](https://github.com/mrjshzk) and [alextkd2003](https://github.com/alextkd2003) for providing POC PRs for this feature.
+- It is now possible to read expression properties back from the state chart. This is useful for debugging or for avoiding holding the same value in multiple places ([#110](https://github.com/derkork/godot-statecharts/issues/110)).
+- It is now possible to set initial values for expression properties in the state chart. This avoids getting errors when using expressions in transitions that run immediately after the state chart is started and the expression property has not been set yet. This is again backwards-compatible, all existing state charts will automatically start with an empty dictionary of expression properties.
+
 ### Improved
 - The state chart debugger in the editor now automatically selects the first state chart when the game starts. This reduces the amount of clicking needed to start debugging a state chart ([#118](https://github.com/derkork/godot-statecharts/issues/118)).
+- The state chart will now detect infinite transition loops that would cause the game to freeze (>100 transitions within a single frame). When such a loop is detected, the state chart will print an error message and stop processing transitions. After that, the state chart is in an undefined state and will no longer work properly. This has been added for easier debugging of freezes. Note that this will not catch infinite loops that involve delayed transitions as such loops will not freeze the game and may actually be desired ([#116](https://github.com/derkork/godot-statecharts/issues/116)).
+- The constructor of the `StateChart` wrapper class for C# is now protected to allow for easier subclassing ([#119](https://github.com/derkork/godot-statecharts/issues/119)).
+- There are now some automated tests to ensure that changes to the library will not break existing functionality. This should help to prevent regressions in the future.
+
 ### Fixed
 - The history log in the state chart debugger in the editor now only updates when there were actually changes. This will increase performance and prevent the log from becoming un-scrollable.
-
+- Expression guards will no longer print the error message twice if the expression is not valid.
 
 ## [0.15.2] - 2024-04-17
 ### Fixed
