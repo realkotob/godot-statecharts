@@ -3,12 +3,111 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## Unreleased
+
+## [0.22.5] - 2026-06-25
+### Fixed
+- Fixed a type hint to ensure compatibility with Godot 4.7. A big thanks goes out to [Paul Gestwicki](https://github.com/doctor-g) for submitting a PR with this fix ([#224](https://github.com/derkork/godot-statecharts/issues/224)).
+
+## [0.22.4] - 2026-03-24
+### Fixed
+- You can no longer accidentally "rename" an empty event name in the event management dialog ([#218](https://github.com/derkork/godot-statecharts/issues/218))
+- The event refactor dialog now properly pops up in the middle of the editor and is movable instead being stuck at the top left of the window.
+- UIDs have been updated so all relevant files have UIDs now, also a duplicate UID issue has been fixed.
+
+## [0.22.3] - 2026-02-20
+### Fixed
+- Added type hints everywhere in the project. This will make the project easier to maintain and use. A big thanks goes out to [Renato Rotenberg](https://github.com/Brawmario) for submitting a PR to get the work started ([#200](https://github.com/derkork/godot-statecharts/pull/200)).
+- Fixed a typing error in the `StateChart` class which would prevent the addon from loading when addons were included in type checking ([#213](https://github.com/derkork/godot-statecharts/issues/213)).
+
+## [0.22.2] - 2025-10-23
+### Fixed
+- History states should no longer cause memory leaks ([#196](https://github.com/derkork/godot-statecharts/issues/196)). A big thanks goes to [7hells](https://github.com/7hells) who provided a PR with the fix.
+
+## [0.22.1] - 2025-08-21
+### Fixed
+- When using an expression for the transition delay, and listening to the `transition_pending` signal you will now get the proper initial delay from that expression instead of a zero ([#190](https://github.com/derkork/godot-statecharts/issues/190)). 
+
+## [0.22.0] - 2025-06-22
+### Added
+- It is now possible to save and restore a state chart's state using the new `StateChartSerializer` class. This can be useful for saving and loading games or in networked situations where the current state needs to be transferred  to a joining client. A huge thanks goes out to [Jeff Ammons](https://github.com/jammons) for digging into this rather complex topic and providing a [pull request](https://github.com/derkork/godot-statecharts/pull/183). 
+
+### Fixed
+- A few compiler warnings were resolved for the C# implementation. A big thanks goes to [Walter Geisler](https://github.com/Soren025) for providing a [pull request](https://github.com/derkork/godot-statecharts/pull/185) for this ([#184](https://github.com/derkork/godot-statecharts/issues/184))!
+
+## [0.21.5] - 2025-04-05
+### Improved
+- The addon now ships with UID files for Godot 4.4 ([#178](https://github.com/derkork/godot-statecharts/issues/178)).
+- The platformer example was improved as to not needlessly send events all the time which pollute the history log. A big thanks goes out to [mrezai](https://github.com/mrezai) for submitting a PR with this improvement ([#179](https://github.com/derkork/godot-statecharts/pull/179))
+
+
+## [0.21.4] - 2025-03-28
+### Improved
+- Added in-editor error message when delay expression for transitions is empty. Also improved the error messages when an expression fails to parse or run. ([#174](https://github.com/derkork/godot-statecharts/issues/174)).
+
+## [0.21.3] - 2025-02-12
+### Fixed
+- When transitioning into a child of a parallel state, other compound children of this parallel state will now properly enter their initial state ([#166](https://github.com/derkork/godot-statecharts/issues/166)).
+
+## [0.21.2] - 2025-02-09
+### Fixed
+- The connection between state chart and the remote debugger is now properly shut down and reopened when a scene is reloaded with `change_scene_to_xxx` ([#165](https://github.com/derkork/godot-statecharts/issues/165)).
+
+## [0.21.1] - 2025-02-06
+### Fixed
+- The state chart will no longer wrongly enter initial states of compound states under certain circumstances ([#164](https://github.com/derkork/godot-statecharts/issues/164)).
+- Events sent on `state_enter` in parallel states are no longer ignored if the event was part of the state chart initialization sequence ([#143](https://github.com/derkork/godot-statecharts/issues/143)).
+
+### Improved
+- The automated test suite has received some improvements which help debugging issues faster in the future.
+
+## [0.21.0] - 2025-01-31
+### Breaking Change
+- At long last, automatic transitions can now also track state changes. This way a _State Is Active_ guard can now be used in an automatic transition to run this transition whenever another state becomes active ([#114](https://github.com/derkork/godot-statecharts/issues/114)). Note that this was previously not possible, so projects which tried to emulate this behaviour using other means (e.g. continuously sending events) can now take advantage of this new behaviour and simplify their code and improve performance. Since the state chart now behaves differently than before, I'm marking this as a breaking change, though it should not affect most projects.
+
+### Fixed
+- When a transition was pending, another automatic transition could supersede it even if the pending transition had a higher priority. This has been fixed and a pending transition can only be superseded by a lower priority transition if the pending transitions trigger condition(s) are no longer met. 
+
+## [0.20.0] - 2025-01-21
+### Improved
+- All nodes have received new icons which are more consistent with Godot's built-in icons and are easier to recognize at a glance. A huge thanks goes out to [Donatas Kirda](https://github.com/bloodwiing) who took the time to create these fantastic new icons and provided a PR with them ([#160](https://github.com/derkork/godot-statecharts/pull/160)).
+
+## [0.19.0] - 2025-01-20
+### Changed
+- The _Animation Tree State_ and _Animation Player State_ nodes are now deprecated and should not be used in new projects anymore. The nodes will now display a warning in the tree and have been removed from the _Quick Add_ sidebar. They will be fully removed in a future release.
+
+## [0.18.0] - 2024-12-07
+### Added
+- It is now possible to manually trigger transitions using the new `take` method on the transition. This can be useful if you want to directly trigger a transition from code rather than sending events. A big thanks goes out to [Mehmet Sahin](https://github.com/mixemer) for suggesting this feature and providing a PR for it ([#152](https://github.com/derkork/godot-statecharts/issues/152)).
+
+## [0.17.1] - 2024-11-04
+### Added
+- The state chart will now issue a warning in debug builds when trying to send an event that is not defined in any transition of the state chart. This can help to catch typos in event names early on ([#150](https://github.com/derkork/godot-statecharts/issues/150)). This warning is now enabled by default but can be disabled per state chart in state chart settings.  
+
+## [0.17.0] - 2024-08-16
+### Added
+- The C# wrappers now provide type-safe events for all signals that the underlying nodes emit. This way you can simply subscribe to a signal using the familiar `+=` notation, e.g. `stateChart.StateEntered += OnStateEntered`. This makes it easier to work with the state chart from C# code. A big thanks goes out to [Marques Lévy](https://github.com/Prakkkmak) for suggesting this feature and providing a POC PR for it ([#126](https://github.com/derkork/godot-statecharts/pull/126)). Note that the usual rules for signals in C# apply, e.g. signal connections will not automatically be disconnected when the receiver is freed. 
+
+### Fixed
+- The library now handles cases better where code tries to access a state chart that has been removed from the tree. This may happen when using Godot's `change_scene_to_file` or `change_scene_to_packed` functions. Debug output in these cases will no longer try to get full path names of nodes that have been removed from the tree. This should prevent errors and crashes in these cases ([#129](https://github.com/derkork/godot-statecharts/issues/129)).
+- The error messages for evaluating expressions have been improved. They now show the expression that was evaluated and the result of the evaluation ([#138](https://github.com/derkork/godot-statecharts/issues/138)) 
+- Compound state should no longer show a warning for overriding `add_child`. A big thanks goes out to [yesfish](https://github.com/huwpascoe) for finding this and providing a fix ([#128](https://github.com/derkork/godot-statecharts/issues/128)).
+- The editor side bar can now be made smaller than before which can be useful when working on smaller screens ([#127](https://github.com/derkork/godot-statecharts/issues/127)).
+
+## [0.16.0] - 2024-06-06 
+### Added
+- The delay for a transition can now be an expression rather than just a float value. This allows for more dynamic transitions. For example the delay can now be a random value (using `randf_range()`) or any expression property. Of course you can still just use a single float number.  This change is backwards-compatible, all existing state charts will automatically be converted to the new format when loaded. There is a new example named `random_transitions` which shows this new feature to create a randomly wandering mob. A big thanks goes out to [Miguel Silva](https://github.com/mrjshzk) and [alextkd2003](https://github.com/alextkd2003) for providing POC PRs for this feature.
+- It is now possible to read expression properties back from the state chart. This is useful for debugging or for avoiding holding the same value in multiple places ([#110](https://github.com/derkork/godot-statecharts/issues/110)).
+- It is now possible to set initial values for expression properties in the state chart. This avoids getting errors when using expressions in transitions that run immediately after the state chart is started and the expression property has not been set yet. This is again backwards-compatible, all existing state charts will automatically start with an empty dictionary of expression properties.
+
 ### Improved
 - The state chart debugger in the editor now automatically selects the first state chart when the game starts. This reduces the amount of clicking needed to start debugging a state chart ([#118](https://github.com/derkork/godot-statecharts/issues/118)).
+- The state chart will now detect infinite transition loops that would cause the game to freeze (>100 transitions within a single frame). When such a loop is detected, the state chart will print an error message and stop processing transitions. After that, the state chart is in an undefined state and will no longer work properly. This has been added for easier debugging of freezes. Note that this will not catch infinite loops that involve delayed transitions as such loops will not freeze the game and may actually be desired ([#116](https://github.com/derkork/godot-statecharts/issues/116)).
+- The constructor of the `StateChart` wrapper class for C# is now protected to allow for easier subclassing ([#119](https://github.com/derkork/godot-statecharts/issues/119)).
+- There are now some automated tests to ensure that changes to the library will not break existing functionality. This should help to prevent regressions in the future.
+
 ### Fixed
 - The history log in the state chart debugger in the editor now only updates when there were actually changes. This will increase performance and prevent the log from becoming un-scrollable.
-
+- Expression guards will no longer print the error message twice if the expression is not valid.
 
 ## [0.15.2] - 2024-04-17
 ### Fixed

@@ -15,6 +15,10 @@ run/main_scene="res://godot_state_charts_examples/platformer/platformer_demo.tsc
 config/features=PackedStringArray("4.0", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[debug]
+
+gdscript/warnings/exclude_addons=false
+
 [display]
 
 window/size/viewport_width=640
@@ -27,7 +31,7 @@ project/assembly_name="godot-state-charts"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_state_charts/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_state_charts/plugin.cfg", "res://addons/gut/plugin.cfg")
 
 [rendering]
 
